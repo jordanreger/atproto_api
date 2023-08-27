@@ -1,3 +1,6 @@
+> [!WARNING]
+> Do not use this yet, it's nowhere near done. It will be posted on [crates.io](https://crates.io) under the same name when it's complete.
+
 # atproto_api
 A simple [ATProto](https://atproto.com) implementation in Rust
 
