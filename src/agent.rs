@@ -1,60 +1,84 @@
-#[derive(Debug)]
-pub struct AtpAgent {
-    pub service: String,
-}
+pub mod atp_agent {
+    #[derive(Debug, serde::Serialize, serde::Deserialize)]
+    pub struct Session {
+        #[serde(rename = "accessJwt")]
+        access_jwt: String,
+        did: String,
+        email: String,
+        handle: String,
+        #[serde(rename = "refreshJwt")]
+        refresh_jwt: String,
+    }
 
-#[derive(serde::Serialize)]
-pub struct Auth {
-    identifier: String,
-    password: String,
-}
-
-impl AtpAgent {
-    pub async fn login(
-        &self,
+    #[derive(serde::Serialize)]
+    struct Auth {
         identifier: String,
         password: String,
-    ) -> Result<String, Box<dyn std::error::Error>> {
-        // check url is valid or panic
-        let service = match url::Url::parse(&self.service) {
-            Ok(service) => service.to_string(),
-            Err(err) => panic!("{}", err),
-        };
+    }
 
-        let client = reqwest::Client::builder().build()?;
+    #[derive(Debug)]
+    pub struct Agent {
+        pub service: String,
+    }
 
-        let auth = Auth {
-            identifier: identifier.into(),
-            password: password.into(),
-        };
+    #[derive(Debug)]
+    pub struct AtpAgent {
+        pub service: String,
+        pub session: Session,
+    }
 
-        // create session
-        let session = client
-            .post(format!("{service}xrpc/com.atproto.server.createSession"))
-            .header("User-Agent", "atproto_api/0.1.0")
-            .json(&auth)
-            .send()
-            .await?
-            .json::<serde_json::Value>()
-            .await?;
+    impl Agent {
+        pub async fn login(
+            &self,
+            identifier: String,
+            password: String,
+        ) -> Result<AtpAgent, Box<dyn std::error::Error>> {
+            let service = crate::tools::validate_url(&self.service);
 
-        // check if error and panic otherwise return session json
-        let res = match &session.get("error") {
-            Some(x) if !x.is_null() => {
-                let error = &session.get("error").unwrap().to_string().replace("\"", "");
-                let message = &session
-                    .get("message")
-                    .unwrap()
-                    .to_string()
-                    .replace("\"", "");
-                panic!(
-                    "{}",
-                    format!("{service} error {error}: {message}").to_string()
-                )
-            }
-            _ => session.to_string(),
-        };
+            let client = reqwest::Client::builder().build()?;
 
-        Ok(res)
+            let auth = Auth {
+                identifier: identifier.into(),
+                password: password.into(),
+            };
+
+            let create_session = client
+                .post(format!("{service}xrpc/com.atproto.server.createSession"))
+                .header("User-Agent", "atproto_api/0.1.0")
+                .json(&auth)
+                .send()
+                .await?
+                .json::<serde_json::Value>()
+                .await?;
+
+            let res = match &create_session.get("error") {
+                Some(x) if !x.is_null() => {
+                    let error = &create_session
+                        .get("error")
+                        .unwrap()
+                        .to_string()
+                        .replace("\"", "");
+                    let message = &create_session
+                        .get("message")
+                        .unwrap()
+                        .to_string()
+                        .replace("\"", "");
+                    panic!(
+                        "{}",
+                        format!("{service} error {error}: {message}").to_string()
+                    )
+                }
+                _ => create_session.to_string(),
+            };
+
+            let session: Session = serde_json::from_str(res.as_str()).unwrap();
+
+            let authorized = AtpAgent {
+                service: service.into(),
+                session: session.into(),
+            };
+
+            Ok(authorized)
+        }
     }
 }
