@@ -1,5 +1,5 @@
 pub mod atp_agent {
-    #[derive(Debug, serde::Serialize, serde::Deserialize)]
+    #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
     pub struct Session {
         #[serde(rename = "accessJwt")]
         access_jwt: String,
@@ -16,24 +16,49 @@ pub mod atp_agent {
         password: String,
     }
 
-    #[derive(Debug)]
-    pub struct Agent {
-        pub service: String,
-    }
-
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub struct AtpAgent {
         pub service: String,
-        pub session: Session,
+        pub session: Option<Session>,
     }
 
-    impl Agent {
-        pub async fn login(
-            &self,
+    #[async_trait::async_trait]
+    pub trait Agent: Sized {
+        fn default() -> AtpAgent;
+        fn new(url: String) -> AtpAgent;
+        async fn login(
+            mut self,
+            identifier: String,
+            password: String,
+        ) -> Result<AtpAgent, Box<dyn std::error::Error>>;
+    }
+
+    #[async_trait::async_trait]
+    impl Agent for AtpAgent {
+        fn default() -> AtpAgent {
+            AtpAgent {
+                service: "https://bsky.social".to_string(),
+                session: None,
+            }
+        }
+
+        fn new(url: String) -> AtpAgent {
+            AtpAgent {
+                service: crate::tools::validate_url(&url),
+                session: None,
+            }
+        }
+
+        async fn login(
+            mut self,
             identifier: String,
             password: String,
         ) -> Result<AtpAgent, Box<dyn std::error::Error>> {
-            let service = crate::tools::validate_url(&self.service);
+            // check url is valid or panic
+            let service = match url::Url::parse(&self.service) {
+                Ok(service) => service.to_string(),
+                Err(err) => panic!("{}", err),
+            };
 
             let client = reqwest::Client::builder().build()?;
 
@@ -42,7 +67,8 @@ pub mod atp_agent {
                 password: password.into(),
             };
 
-            let create_session = client
+            // create session
+            let session = client
                 .post(format!("{service}xrpc/com.atproto.server.createSession"))
                 .header("User-Agent", "atproto_api/0.1.0")
                 .json(&auth)
@@ -51,34 +77,27 @@ pub mod atp_agent {
                 .json::<serde_json::Value>()
                 .await?;
 
-            let res = match &create_session.get("error") {
+            // check if error and panic otherwise return session json
+            let res = match &session.get("error") {
                 Some(x) if !x.is_null() => {
-                    let error = &create_session
-                        .get("error")
-                        .unwrap()
-                        .to_string()
-                        .replace("\"", "");
-                    let message = &create_session
+                    let error = &session.get("error").unwrap().to_string().replace("\"", "");
+                    let message = &session
                         .get("message")
                         .unwrap()
                         .to_string()
                         .replace("\"", "");
                     panic!(
                         "{}",
-                        format!("{service} error {error}: {message}").to_string()
+                        format!("{service} returns error {error}: {message}").to_string()
                     )
                 }
-                _ => create_session.to_string(),
+                _ => session,
             };
 
-            let session: Session = serde_json::from_str(res.as_str()).unwrap();
+            let session: Session = serde_json::from_value(res).unwrap();
 
-            let authorized = AtpAgent {
-                service: service.into(),
-                session: session.into(),
-            };
-
-            Ok(authorized)
+            self.session = Some(session);
+            Ok(self)
         }
     }
 }
