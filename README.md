@@ -59,4 +59,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
   Ok(())
 }
+
+// AtpAgent { service: "https://fjall.net/", session: None }
 ```
