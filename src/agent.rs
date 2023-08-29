@@ -37,7 +37,7 @@ pub mod atp_agent {
     impl Agent for AtpAgent {
         fn default() -> AtpAgent {
             AtpAgent {
-                service: "https://bsky.social".to_string(),
+                service: "https://bsky.social/".to_string(),
                 session: None,
             }
         }

@@ -11,8 +11,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let agent = agent
         .login(
-            dotenv!("BLUESKY_IDENTIFIER").to_string(),
-            dotenv!("BLUESKY_PASSWORD").to_string(),
+            dotenv!("FJALL_IDENTIFIER").to_string(),
+            dotenv!("FJALL_PASSWORD").to_string(),
         )
         .await?;
 
