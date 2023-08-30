@@ -2,7 +2,7 @@
 > This code is mostly useable. A few things are missing, like `.post()` and some other minor methods, but the majority is complete. 
 
 # atproto_api
-[![Crates.io](https://img.shields.io/crates/v/atproto_api)](https://crates.io/atproto_api)
+[![Crates.io](https://img.shields.io/crates/v/atproto_api)](https://crates.io/crates/atproto_api)
 
 A simple [ATProto](https://atproto.com) implementation in Rust
 
