@@ -1,5 +1,6 @@
 [package]
 name = "atproto_api"
+description = "A simple ATProto implementation in Rust"
 version = "0.1.0"
 edition = "2021"
 authors = ["Jordan Reger <mail@jordanreger.com>"]
