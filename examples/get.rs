@@ -5,7 +5,7 @@ use atproto_api::{Agent, AtpAgent};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let agent = AtpAgent::default();
+    let agent = AtpAgent::new("https://bsky.social".to_string());
 
     let agent = agent
         .login(

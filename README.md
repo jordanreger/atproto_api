@@ -10,9 +10,9 @@ A simple [ATProto](https://atproto.com) implementation in Rust
 `AtpAgent` is meant for general AT Protocol operations.
 
 ### Initialization
-It can be initialized in two ways:
+It can be initialized like this:
 
-1. [`default()`](https://git.sr.ht/~jordanreger/atproto_api/tree/main/item/examples/default.rs)
+<!--1. [`default()`](https://git.sr.ht/~jordanreger/atproto_api/tree/main/item/examples/default.rs)
 ```rs
 use atproto_api::{Agent, AtpAgent};
 
@@ -27,7 +27,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 // AtpAgent { service: "https://bsky.social/", session: None }
 ```
-2. [`new()`](https://git.sr.ht/~jordanreger/atproto_api/tree/main/item/examples/new.rs)
+2. [`new()`](https://git.sr.ht/~jordanreger/atproto_api/tree/main/item/examples/new.rs)-->
 ```rs
 #[macro_use]
 extern crate dotenv_codegen;
@@ -57,7 +57,7 @@ use atproto_api::{Agent, AtpAgent};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-  let agent = AtpAgent::default();
+  let agent = AtpAgent::new("https://bsky.social".to_string());
 
   let agent = agent
     .login(

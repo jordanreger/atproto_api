@@ -34,7 +34,7 @@ pub mod atp_agent {
 
     #[async_trait::async_trait]
     pub trait Agent: Sized {
-        fn default() -> AtpAgent;
+        //fn default() -> AtpAgent;
         fn new(url: String) -> AtpAgent;
         async fn login(
             mut self,
@@ -51,13 +51,17 @@ pub mod atp_agent {
 
     #[async_trait::async_trait]
     impl Agent for AtpAgent {
+        // WARNING: default() is deprecated. You can
+        // read more about this decision here:
+        // https://todo.sr.ht/~jordanreger/atproto_api/7
+
         // AtpAgent::default()
-        fn default() -> AtpAgent {
-            AtpAgent {
-                service: "https://bsky.social/".to_string(),
-                session: None,
-            }
-        }
+        // fn default() -> AtpAgent {
+        //     AtpAgent {
+        //         service: "https://bsky.social/".to_string(),
+        //         session: None,
+        //     }
+        // }
 
         // AtpAgent::new("https://fjall.net".to_string())
         fn new(url: String) -> AtpAgent {
@@ -160,7 +164,7 @@ pub mod atp_agent {
             parameters: serde_json::Value,
         ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
             let service = &self.service;
-            let session = self.session.unwrap();
+            let session = &self.session.as_mut().unwrap();
             let jwt = &session.access_jwt;
             let client = reqwest::Client::builder().build()?;
             let res = client
@@ -181,6 +185,8 @@ pub mod atp_agent {
                 }
                 _ => res,
             };
+
+            let _refresh_session = self.refresh_session();
 
             Ok(res)
         }
