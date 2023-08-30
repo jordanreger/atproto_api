@@ -2,6 +2,12 @@
 name = "atproto_api"
 version = "0.1.0"
 edition = "2021"
+authors = ["Jordan Reger <mail@jordanreger.com>"]
+readme = "README.md"
+homepage = "https://atproto.com"
+repository = "https://git.sr.ht/~jordanreger/atproto_api"
+license = "BSD-3-Clause"
+keywords = ["atproto", "atprotocol", "bluesky", "bsky"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

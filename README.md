@@ -1,8 +1,8 @@
 > [!NOTE]
-> This code is mostly useable. A few things are missing, like `.post()` and some other minor methods, but the majority is complete. Once it *is* complete, it will be available on [crates.io](https://crates.io) under the same name.
+> This code is mostly useable. A few things are missing, like `.post()` and some other minor methods, but the majority is complete. It is currently available on [crates.io](https://crates.io) under 
 
 # atproto_api
-#### v0.1.0
+![Crates.io (latest)](https://img.shields.io/crates/dv/atproto-api)
 A simple [ATProto](https://atproto.com) implementation in Rust
 
 ## `AtpAgent`
