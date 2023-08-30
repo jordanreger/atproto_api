@@ -2,7 +2,7 @@
 > This code is mostly useable. A few things are missing, like `.post()` and some other minor methods, but the majority is complete. It is currently available on [crates.io](https://crates.io) under 
 
 # atproto_api
-![Crates.io (latest)](https://img.shields.io/crates/dv/atproto-api)
+![Crates.io](https://img.shields.io/crates/v/atproto_api)
 A simple [ATProto](https://atproto.com) implementation in Rust
 
 ## `AtpAgent`
